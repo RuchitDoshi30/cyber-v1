@@ -21,6 +21,21 @@ const Components = {
         `;
     },
 
+    // Chart Container
+    createChartContainer(id, title, subtitle, height = '300px', cols = 'col-span-1') {
+        return `
+            <div class="bg-white dark:bg-gray-800 rounded-lg p-6 border border-gray-200 dark:border-gray-700/50 shadow-lg ${cols}">
+                <div class="mb-4">
+                    <h3 class="text-lg font-bold text-gray-900 dark:text-white">${title}</h3>
+                    ${subtitle ? `<p class="text-sm text-gray-500 dark:text-gray-400">${subtitle}</p>` : ''}
+                </div>
+                <div class="relative w-full" style="height: ${height}">
+                    <canvas id="${id}"></canvas>
+                </div>
+            </div>
+        `;
+    },
+
     // Severity Badge
     getSeverityBadgeClass(severity) {
         const severityMap = {
@@ -333,19 +348,84 @@ const Components = {
         `;
     },
 
-    // Detailed Anomaly Card for AI Insights Page
+    // Ingestion Steps Visual (Feature 1)
+    createIngestionSteps(currentStep = 3) {
+        const steps = [
+            { icon: '📤', label: 'Uploaded' },
+            { icon: '⚙️', label: 'Parsed' },
+            { icon: '🔍', label: 'Indexed' },
+            { icon: '✅', label: 'Ready' }
+        ];
+
+        // Calculate progress width for the blue line (0% to 100%)
+        const progressPercent = (Math.min(currentStep, steps.length - 1) / (steps.length - 1)) * 100;
+
+        return `
+            <div class="w-full py-4 overflow-hidden">
+                <div class="flex items-center justify-between relative px-1">
+                    <!-- Background Line -->
+                    <div class="absolute left-0 top-1/2 transform -translate-y-1/2 w-full h-1 bg-gray-200 dark:bg-gray-700 -z-10"></div>
+                    <!-- Active Progress Line -->
+                    <div id="ingestion-progress-line" class="absolute left-0 top-1/2 transform -translate-y-1/2 h-1 bg-blue-600 transition-all duration-700 ease-in-out -z-10" style="width: ${progressPercent}%"></div>
+                    
+                    ${steps.map((step, index) => {
+            const active = index <= currentStep;
+            // Unified transition classes for smooth state changes
+            const baseCircle = "w-6 h-6 md:w-8 md:h-8 rounded-full border-2 flex items-center justify-center text-[10px] md:text-xs font-bold transition-all duration-500 ease-in-out z-10 bg-white dark:bg-gray-900";
+            const activeState = "bg-blue-600 border-blue-600 text-white shadow-sm";
+            const inactiveState = "border-gray-300 dark:border-gray-600 text-gray-400";
+
+            return `
+                            <div class="flex flex-col items-center gap-1 z-10">
+                                <div id="step-circle-${index}" class="${baseCircle} ${active ? activeState : inactiveState}">
+                                    ${active ? step.icon : index + 1}
+                                </div>
+                                <span id="step-label-${index}" class="text-[8px] md:text-[10px] font-semibold uppercase tracking-wider transition-colors duration-500 ${active ? 'text-blue-600 dark:text-blue-400' : 'text-gray-400'}">
+                                    ${step.label}
+                                </span>
+                            </div>
+                        `;
+        }).join('')}
+                </div>
+            </div>
+        `;
+    },
+
+    // Investigation Workflow Tracking (Feature 5)
+    createInvestigationProgress(currentStage = 1) {
+        const stages = ['Ingestion', 'Detection', 'Correlation', 'Reporting'];
+        const progress = ((currentStage + 0.5) / stages.length) * 100;
+
+        return `
+            <div class="bg-white dark:bg-gray-800 rounded-lg p-6 border border-gray-200 dark:border-gray-700/50 shadow-lg">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-bold text-gray-900 dark:text-white">Investigation Status</h3>
+                    <span class="px-2 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-xs font-bold uppercase rounded">In Progress</span>
+                </div>
+                <div class="relative w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-full mb-4 overflow-hidden">
+                    <div class="absolute top-0 left-0 h-full bg-blue-600 rounded-full transition-all duration-500" style="width: ${progress}%"></div>
+                </div>
+                <div class="flex justify-between text-xs font-medium text-gray-500 dark:text-gray-400">
+                    ${stages.map((stage, idx) => `
+                        <span class="${idx <= currentStage ? 'text-blue-600 dark:text-blue-400 font-bold' : ''}">${stage}</span>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+    },
+
+    // Detailed Anomaly Card for AI Insights Page (Enhanced with XAI - Feature 4)
     createDetailedAnomalyCard(anomaly) {
         // Map severity to colors
         const severityColors = {
             'Critical': 'text-red-500 border-red-500/30 bg-red-500/10',
             'Warning': 'text-orange-500 border-orange-500/30 bg-orange-500/10',
             'Info': 'text-blue-500 border-blue-500/30 bg-blue-500/10',
-            'High': 'text-red-500 border-red-500/30 bg-red-500/10', // Fallback
-            'Medium': 'text-orange-500 border-orange-500/30 bg-orange-500/10', // Fallback
-            'Low': 'text-blue-500 border-blue-500/30 bg-blue-500/10' // Fallback
+            'High': 'text-red-500 border-red-500/30 bg-red-500/10',
+            'Medium': 'text-orange-500 border-orange-500/30 bg-orange-500/10',
+            'Low': 'text-blue-500 border-blue-500/30 bg-blue-500/10'
         };
 
-        // Normalize severity label
         let severityLabel = anomaly.severity;
         if (severityLabel === 'High') severityLabel = 'Critical';
         if (severityLabel === 'Medium') severityLabel = 'Warning';
@@ -353,15 +433,17 @@ const Components = {
 
         const severityClass = severityColors[severityLabel] || severityColors['Info'];
         const confidencePercent = (anomaly.confidenceScore * 100).toFixed(0);
+        const progressColor = 'bg-blue-500';
 
-        // Progress bar color
-        const progressColor = 'bg-blue-500'; // Screenshot mostly shows blue
-
-        // Systems pills
         const systemsHtml = anomaly.affectedSystems ?
             anomaly.affectedSystems.map(sys =>
                 `<span class="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded text-xs font-mono border border-gray-200 dark:border-gray-600">${sys}</span>`
             ).join('') : '';
+
+        // Explainable AI Logic (Static Simulation)
+        const xaiExplanation = anomaly.description.includes('login') ? 'Unusual frequency of failed attempts (Z-Score > 3.5) from a single external IP address.' :
+            anomaly.description.includes('outbound') ? 'Data transfer volume exceeds daily baseline by 400% during non-business hours.' :
+                'Process signature deviates from known-good allowlist for this host type.';
 
         return `
             <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700/50 p-6 shadow-lg mb-6 last:mb-0">
@@ -387,6 +469,12 @@ const Components = {
                     </div>
                 </div>
 
+                <!-- XAI: Why Flagged? (Feature 4) -->
+                <div class="mb-6 bg-yellow-50 dark:bg-yellow-900/10 p-3 rounded border border-yellow-100 dark:border-yellow-900/30">
+                    <p class="text-xs font-bold text-yellow-700 dark:text-yellow-500 uppercase mb-1">🔍 Why was this flagged?</p>
+                    <p class="text-sm text-gray-700 dark:text-gray-300 italic">"${xaiExplanation}"</p>
+                </div>
+
                 <!-- Affected Systems -->
                 <div class="mb-6">
                     <span class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">Affected Systems</span>
@@ -409,7 +497,8 @@ const Components = {
                 <!-- Footer -->
                 <div class="flex justify-between items-center pt-2">
                     <span class="text-xs text-gray-500">${anomaly.relatedLogIds ? anomaly.relatedLogIds.length : 0} related log entries</span>
-                    <button class="text-sm text-blue-600 dark:text-blue-500 hover:text-blue-500 dark:hover:text-blue-400 font-medium flex items-center gap-1 transition-colors">
+                    <button onclick="viewAnomalyLogs('${(anomaly.relatedLogIds || []).join(',')}', '${encodeURIComponent(anomaly.description)}', '${anomaly.severity}')" 
+                        class="text-sm text-blue-600 dark:text-blue-500 hover:text-blue-500 dark:hover:text-blue-400 font-medium flex items-center gap-1 transition-colors">
                         View logs 
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
                     </button>

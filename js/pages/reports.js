@@ -71,24 +71,78 @@ const ReportsPage = {
                     <!-- Right Column: Summary & Chain of Custody -->
                     <div class="space-y-6">
                         
-                        <!-- Report Summary Card -->
+                        <!-- Report Preview Chart & Stats (Feature 7) -->
+                        <div class="relative bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700/50 p-6 shadow-lg overflow-hidden">
+                            <!-- Watermark (Feature 7) -->
+                            <div class="absolute top-0 right-0 -mr-4 -mt-4 w-32 h-32 bg-gray-100 dark:bg-gray-700 transform rotate-45 flex items-end justify-center pb-2 z-0 opacity-50">
+                                <span class="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">Prototype</span>
+                            </div>
+                            
+                            <div class="relative z-10">
+                                <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4">Report Preview</h3>
+                                ${Components.createChartContainer('chart-report-preview', '', 'Snapshot of event distribution (65% Success)', '180px')}
+                                
+                                <div class="mt-4 grid grid-cols-2 gap-4 text-center">
+                                    <div class="p-2 bg-gray-50 dark:bg-gray-900/50 rounded">
+                                        <span class="block text-xs text-gray-500">Total Logs</span>
+                                        <span class="font-bold text-gray-900 dark:text-white">1,250</span>
+                                    </div>
+                                    <div class="p-2 bg-gray-50 dark:bg-gray-900/50 rounded">
+                                        <span class="block text-xs text-gray-500">Violations</span>
+                                        <span class="font-bold text-red-500">23</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Report Summary Checklist -->
                         <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700/50 p-6 shadow-lg">
-                            <div class="mb-4">
-                                <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-1">Report Summary</h3>
-                                <p class="text-sm text-gray-600 dark:text-gray-400">What will be included</p>
+                            <div class="mb-4 flex justify-between items-center">
+                                <div>
+                                    <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-1">Section Checklist</h3>
+                                    <p class="text-sm text-gray-600 dark:text-gray-400">Included in final export</p>
+                                </div>
+                                <span class="text-xs font-mono bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-100 px-2 py-1 rounded">v1.2</span>
                             </div>
                             <div id="summary-list" class="space-y-1">
                                 <!-- Populated by updateSummary() -->
                             </div>
                         </div>
 
-                        <!-- Chain of Custody Panel -->
-                        ${Components.createChainOfCustodyPanel(this.reportId)}
+                        <!-- Chain of Custody Panel (Feature 6 - Enhanced) -->
+                        <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700/50 p-6 shadow-lg relative overflow-hidden">
+                             <div class="flex items-center gap-2 mb-4 text-gray-900 dark:text-white font-bold text-lg">
+                                <span>⛓️</span> Chain of Custody
+                             </div>
+                             <div class="space-y-3 text-sm font-mono text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-900/50 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
+                                <div class="flex justify-between">
+                                    <span class="text-gray-500">Report ID:</span>
+                                    <span class="font-bold">${this.reportId}</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-500">Hash (SHA-256):</span>
+                                    <span class="text-xs break-all text-right ml-4">8a7f...e3b1</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-500">Ingested:</span>
+                                    <span>2025-01-15 08:30:00 UTC</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-500">Custodian:</span>
+                                    <span>Investigator_01</span>
+                                </div>
+                             </div>
+                             <div class="mt-4 flex justify-center">
+                                <span class="inline-block px-3 py-1 border border-green-500 text-green-600 dark:text-green-400 text-xs font-bold rounded-full uppercase tracking-wider">
+                                    ✓ Read-Only Enforced
+                                </span>
+                             </div>
+                        </div>
                         
                         <!-- Integrity Note -->
-                        <div class="bg-blue-900/10 rounded-lg p-4 border border-blue-500/20">
-                            <p class="text-xs text-gray-400 leading-relaxed">
-                                All exported reports include cryptographic hashes to ensure data integrity and maintain chain of custody for legal proceedings.
+                        <div class="bg-blue-900/10 rounded-lg p-4 border border-blue-500/20 text-center">
+                            <p class="text-xs text-blue-600 dark:text-blue-400 font-medium">
+                                Digital Signature Verified
                             </p>
                         </div>
 
@@ -105,6 +159,33 @@ const ReportsPage = {
     async afterRender() {
         this.updateSummary();
         this.addCheckboxListeners();
+
+        // Initialize Static Chart
+        const ctx = document.getElementById('chart-report-preview');
+        if (ctx) {
+            const isDark = document.documentElement.classList.contains('dark');
+            const textColor = isDark ? '#9ca3af' : '#4b5563';
+
+            // Mock Data for Preview
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Success', 'Failure', 'Error'],
+                    datasets: [{
+                        data: [65, 25, 10], // Static snapshot data
+                        backgroundColor: ['#10b981', '#f59e0b', '#ef4444'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'right', labels: { color: textColor, boxWidth: 12, font: { size: 10 } } }
+                    }
+                }
+            });
+        }
     },
 
     addCheckboxListeners() {

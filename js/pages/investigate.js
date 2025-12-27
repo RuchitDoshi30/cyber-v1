@@ -4,17 +4,64 @@ const InvestigatePage = {
     logs: [],
     currentPage: 1,
     logsPerPage: 10,
+    activeContext: null, // { ids: string[], description: string, severity: string }
+
+    setContext(context) {
+        this.activeContext = context;
+        this.currentPage = 1;
+    },
+
+    clearContext() {
+        this.activeContext = null;
+        this.currentPage = 1;
+        this.render().then(html => {
+            document.getElementById('page-content').innerHTML = html;
+            this.afterRender();
+        });
+    },
 
     async render() {
-        this.logs = await ApiService.getLogs();
+        let allLogs = await ApiService.getLogs();
+
+        // Apply Context Filter
+        if (this.activeContext && this.activeContext.ids) {
+            this.logs = allLogs.filter(log => this.activeContext.ids.includes(log.id));
+        } else {
+            this.logs = allLogs;
+        }
+
+        // Context Banner
+        const contextBanner = this.activeContext ? `
+            <div class="bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-500 p-4 mb-6 rounded-r-lg flex flex-col sm:flex-row sm:items-center justify-between gap-4 animate-fadeIn">
+                <div class="flex items-start gap-3">
+                    <div class="p-2 bg-blue-100 dark:bg-blue-800 rounded-full text-blue-600 dark:text-blue-300">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-bold text-blue-900 dark:text-blue-100 uppercase tracking-wide">Anomaly Drill-Down</h3>
+                        <p class="text-sm text-blue-800 dark:text-blue-200">
+                            Showing evidence for: <span class="font-semibold italic">"${this.activeContext.description}"</span>
+                        </p>
+                    </div>
+                </div>
+                <button onclick="investigatePage.clearContext()" class="px-4 py-2 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-sm font-medium rounded border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors shadow-sm whitespace-nowrap">
+                    Clear Filter
+                </button>
+            </div>
+        ` : '';
 
         return `
             <div class="max-w-7xl mx-auto space-y-6">
+                <!-- Context Banner -->
+                ${contextBanner}
+
                 <!-- Page Header -->
                 <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6 pb-4 border-b border-gray-200 dark:border-gray-800">
                     <div>
                         <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">Investigate Logs</h1>
-                        <p class="text-gray-500 dark:text-gray-400 text-sm">${this.logs.length} logs available for investigation</p>
+                        <p class="text-gray-500 dark:text-gray-400 text-sm">
+                            ${this.logs.length} ${this.activeContext ? 'filtered' : ''} logs available for investigation
+                        </p>
                     </div>
                     <div>
                         <button class="flex items-center gap-2 px-4 py-2 bg-transparent border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors font-medium text-sm">

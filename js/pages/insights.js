@@ -55,9 +55,12 @@ const InsightsPage = {
                     </div>
                 </div>
 
+                <!-- Anomaly Scores Chart -->
+                ${Components.createChartContainer('chart-anomaly-scores', 'Anomaly Scores per Entity', 'Visualizing AI confidence per affected system', '350px', 'w-full')}
+
                 <!-- Tabs & Content -->
                 <div>
-                    <!-- Tabs -->
+                     <!-- Tabs -->
                     <div class="flex gap-2 mb-6 border-b border-gray-200 dark:border-gray-800">
                         <button id="tab-anomalies" onclick="InsightsPage.switchTab('anomalies')" 
                             class="px-4 py-2 text-sm font-bold rounded-t-lg border-t border-l border-r relative -mb-[1px] transition-colors
@@ -76,13 +79,133 @@ const InsightsPage = {
                          ${this.anomalies.map(anomaly => Components.createDetailedAnomalyCard(anomaly)).join('')}
                     </div>
 
-                    <!-- Correlated Events List -->
+                    <!-- Correlated Events List (Feature 3 - Enhanced Visualization) -->
                     <div id="content-correlations" class="hidden">
-                         ${this.correlations.map(correlation => Components.createCorrelationCard(correlation)).join('')}
+                         ${this.correlations.map(correlation => {
+            // Feature 3: Timeline Preview & Case Details
+            const timelineWidth = Math.min(correlation.eventCount * 20, 100);
+            return `
+                                <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700/50 p-6 shadow-lg mb-6 last:mb-0">
+                                    <div class="flex flex-col md:flex-row justify-between md:items-start gap-4 mb-4">
+                                        <div>
+                                            <div class="flex items-center gap-2 mb-1">
+                                                <span class="px-2 py-0.5 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 text-xs font-bold rounded uppercase">
+                                                    Case: ${correlation.groupId}
+                                                </span>
+                                                <span class="text-xs text-gray-500">${correlation.timeRange}</span>
+                                            </div>
+                                            <h3 class="text-lg font-bold text-gray-900 dark:text-white">${correlation.title}</h3>
+                                            <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">${correlation.explanation}</p>
+                                        </div>
+                                        <div class="flex gap-2">
+                                            <div class="text-center px-4 py-2 bg-gray-50 dark:bg-gray-900/50 rounded-lg border border-gray-100 dark:border-gray-700">
+                                                <span class="block text-xl font-bold text-gray-900 dark:text-white">${correlation.eventCount}</span>
+                                                <span class="text-[10px] text-gray-500 uppercase tracking-wide">Events</span>
+                                            </div>
+                                            <div class="text-center px-4 py-2 bg-gray-50 dark:bg-gray-900/50 rounded-lg border border-gray-100 dark:border-gray-700">
+                                                <span class="block text-xl font-bold text-blue-600 dark:text-blue-400">${(correlation.confidence * 100).toFixed(0)}%</span>
+                                                <span class="text-[10px] text-gray-500 uppercase tracking-wide">Confidence</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Feature 3: Small Timeline Preview -->
+                                    <div class="mb-4 pt-4 border-t border-gray-100 dark:border-gray-700">
+                                        <h4 class="text-xs font-bold text-gray-700 dark:text-gray-300 mb-3 uppercase tracking-wide">Event Sequence</h4>
+                                        <div class="relative h-8 w-full bg-gray-50 dark:bg-gray-900/30 rounded-full flex items-center px-4 overflow-hidden">
+                                            <div class="absolute left-0 w-full h-0.5 bg-gray-300 dark:bg-gray-600 z-0"></div>
+                                            <!-- Simulated events dots -->
+                                            <div class="relative z-10 w-2 h-2 rounded-full bg-blue-500 border border-white dark:border-gray-800" style="left: 10%"></div>
+                                            <div class="relative z-10 w-2 h-2 rounded-full bg-blue-500 border border-white dark:border-gray-800" style="left: 30%"></div>
+                                            <div class="relative z-10 w-3 h-3 rounded-full bg-red-500 border-2 border-white dark:border-gray-800 shadow-sm" style="left: 55%" title="Primary Anomaly"></div>
+                                            <div class="relative z-10 w-2 h-2 rounded-full bg-blue-500 border border-white dark:border-gray-800" style="left: 80%"></div>
+                                        </div>
+                                        <div class="flex justify-between text-[10px] text-gray-400 mt-1 font-mono">
+                                            <span>Start</span>
+                                            <span>+15m</span>
+                                            <span>+30m</span>
+                                            <span>End</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="flex flex-wrap gap-2 text-xs">
+                                        <span class="text-gray-500">Sources:</span>
+                                        ${correlation.sources.map(s => `<span class="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-2 py-0.5 rounded">${s}</span>`).join('')}
+                                    </div>
+                                </div>
+                             `;
+        }).join('')}
                     </div>
                 </div>
             </div>
         `;
+    },
+
+    async afterRender() {
+        // Theme Colors
+        const isDark = document.documentElement.classList.contains('dark');
+        const textColor = isDark ? '#9ca3af' : '#4b5563';
+        const gridColor = isDark ? '#374151' : '#e5e7eb';
+
+        const isMobile = window.innerWidth < 768;
+
+        // Data Prep
+        // Map Anomalies to { label: SystemName, value: Score, color: SeverityColor }
+        const labels = [];
+        const data = [];
+        const bgColors = [];
+
+        this.anomalies.forEach(a => {
+            if (a.affectedSystems && a.affectedSystems.length) {
+                a.affectedSystems.forEach(sys => {
+                    labels.push(sys);
+                    data.push(a.confidenceScore * 100); // 0-100 scale
+                    bgColors.push(a.severity === 'Critical' ? '#ef4444' : a.severity === 'Warning' ? '#f59e0b' : '#3b82f6');
+                });
+            }
+        });
+
+        const ctx = document.getElementById('chart-anomaly-scores');
+        if (ctx) {
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Confidence Score (%)',
+                        data: data,
+                        backgroundColor: bgColors,
+                        borderRadius: 4,
+                        barThickness: isMobile ? 20 : 40
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { backgroundColor: isDark ? '#1f2937' : '#ffffff', titleColor: isDark ? '#fff' : '#111827', bodyColor: isDark ? '#d1d5db' : '#4b5563', borderColor: gridColor, borderWidth: 1 }
+                    },
+                    scales: {
+                        x: {
+                            ticks: {
+                                color: textColor,
+                                maxRotation: isMobile ? 90 : 0, // Rotate on mobile if many labels, or auto
+                                autoSkip: true
+                            },
+                            grid: { color: gridColor, display: false }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: { color: textColor },
+                            grid: { color: gridColor },
+                            title: { display: true, text: 'AI Confidence Score', color: textColor }
+                        }
+                    }
+                }
+            });
+        }
     },
 
     switchTab(tabName) {

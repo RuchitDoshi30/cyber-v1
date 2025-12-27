@@ -13,7 +13,7 @@ const QueryPage = {
 
     async render() {
         return `
-            <div class="max-w-7xl mx-auto h-[calc(100vh-140px)] flex flex-col">
+            <div class="max-w-7xl mx-auto h-auto lg:h-[calc(100vh-140px)] flex flex-col">
                 <!-- Header -->
                 <div class="mb-6 flex-shrink-0">
                     <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">Natural Language Query</h1>
@@ -24,7 +24,7 @@ const QueryPage = {
                 <div class="flex-1 grid grid-cols-1 lg:grid-cols-4 gap-6 min-h-0">
                     
                     <!-- Chat Panel (Left/Center - 3 Cols) -->
-                    <div class="lg:col-span-3 flex flex-col bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm overflow-hidden relative">
+                    <div class="lg:col-span-3 flex flex-col h-[85vh] lg:h-full bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm overflow-hidden relative">
                         
                         <!-- AI Identity Header -->
                         <div class="p-6 border-b border-gray-100 dark:border-gray-800 flex items-center gap-3 bg-gray-50/50 dark:bg-gray-800/50">

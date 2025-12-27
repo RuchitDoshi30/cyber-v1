@@ -96,6 +96,26 @@ window.closeModal = function () {
     document.getElementById('modal-container').innerHTML = '';
 };
 
+// Global function for Anomaly Drill-Down
+window.viewAnomalyLogs = function (logIdsStr, description, severity) {
+    // Parse IDs
+    const ids = logIdsStr ? logIdsStr.split(',').filter(id => id.trim() !== '') : [];
+
+    // Set Context in Investigate Page
+    if (window.investigatePage) {
+        window.investigatePage.setContext({
+            ids: ids,
+            description: decodeURIComponent(description),
+            severity: severity
+        });
+
+        // Navigate
+        App.loadPage('investigate');
+    } else {
+        console.error('InvestigatePage module not loaded');
+    }
+};
+
 // Initialize app when DOM is ready
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => App.init());
