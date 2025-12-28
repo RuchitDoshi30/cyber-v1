@@ -10,6 +10,9 @@ const InsightsPage = {
         this.anomalies = await ApiService.getAnomalies();
         this.correlations = await ApiService.getCorrelations();
 
+        // Ensure anomalies have IDs for interaction
+        this.anomalies.forEach((a, i) => { if (!a.id) a.id = `anom-${i}`; });
+
         // Calculate Average Confidence
         const totalConfidence = this.anomalies.reduce((acc, curr) => acc + curr.confidenceScore, 0);
         const avgConfidence = this.anomalies.length > 0 ? ((totalConfidence / this.anomalies.length) * 100).toFixed(0) : 0;
@@ -238,6 +241,29 @@ const InsightsPage = {
             setActive(tabCorrelations);
             contentAnomalies.classList.add('hidden');
             contentCorrelations.classList.remove('hidden');
+        }
+    },
+
+    toggleGraph(anomalyId) {
+        const container = document.getElementById(`graph-container-${anomalyId}`);
+        const arrow = document.getElementById(`arrow-${anomalyId}`);
+
+        if (container && arrow) {
+            const isHidden = container.classList.contains('hidden');
+
+            if (isHidden) {
+                container.classList.remove('hidden');
+                arrow.classList.add('rotate-180');
+
+                // Render Graph if first time
+                const anomaly = this.anomalies.find(a => a.id === anomalyId);
+                if (anomaly) {
+                    Components.renderEnhancedForceGraph(`graph-container-${anomalyId}`, anomaly);
+                }
+            } else {
+                container.classList.add('hidden');
+                arrow.classList.remove('rotate-180');
+            }
         }
     }
 };

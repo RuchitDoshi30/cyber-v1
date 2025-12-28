@@ -18,9 +18,9 @@ const ReportsPage = {
         return `
             <div class="max-w-7xl mx-auto">
                 <!-- Header -->
-                <div class="mb-8 pl-1">
-                    <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">Reports & Export</h1>
-                    <p class="text-gray-600 dark:text-gray-400 text-sm">Generate and export comprehensive investigation reports</p>
+                <div class="mb-6 md:mb-8 pl-1">
+                    <h1 class="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-2">Reports & Export</h1>
+                    <p class="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Generate and export comprehensive investigation reports</p>
                 </div>
 
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -28,13 +28,13 @@ const ReportsPage = {
                     <div class="lg:col-span-2 space-y-6">
                         
                         <!-- Report Configuration Section -->
-                        <div class="bg-white dark:bg-gray-900 rounded-lg p-6 border border-gray-200 dark:border-gray-800 shadow-sm"> 
-                            <div class="mb-6">
-                                <h2 class="text-lg font-bold text-gray-900 dark:text-white mb-1">Report Configuration</h2>
-                                <p class="text-sm text-gray-600 dark:text-gray-400">Select sections to include in your report</p>
+                        <div class="bg-white dark:bg-gray-900 rounded-lg p-4 sm:p-6 border border-gray-200 dark:border-gray-800 shadow-sm"> 
+                            <div class="mb-4 sm:mb-6">
+                                <h2 class="text-base sm:text-lg font-bold text-gray-900 dark:text-white mb-1">Report Configuration</h2>
+                                <p class="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Select sections to include in your report</p>
                             </div>
 
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
                                 ${Components.createSelectionCard('check-logs', 'Log Entries', 'Complete log data with timestamps and metadata', this.selections.logs)}
                                 ${Components.createSelectionCard('check-anomalies', 'Detected Anomalies', 'AI-detected security anomalies and threats', this.selections.anomalies)}
                                 ${Components.createSelectionCard('check-correlations', 'Correlated Events', 'Linked events and case analysis', this.selections.correlations)}
@@ -45,7 +45,7 @@ const ReportsPage = {
                         </div>
 
                         <!-- Export Format Section -->
-                        <div class="bg-white dark:bg-gray-900 rounded-lg p-6 border border-gray-200 dark:border-gray-800 shadow-sm">
+                        <div class="bg-white dark:bg-gray-900 rounded-lg p-4 sm:p-6 border border-gray-200 dark:border-gray-800 shadow-sm">
                             <div class="mb-6">
                                 <h2 class="text-lg font-bold text-gray-900 dark:text-white mb-1">Export Format</h2>
                                 <p class="text-sm text-gray-600 dark:text-gray-400">Choose your preferred export format</p>

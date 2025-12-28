@@ -15,8 +15,8 @@ const UploadPage = {
                 <!-- 1. Page Header -->
                 <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-gray-200 dark:border-gray-800 pb-6">
                     <div>
-                        <h1 class="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-2">Upload Logs</h1>
-                        <p class="text-sm md:text-base text-gray-600 dark:text-gray-400">Secure ingestion of forensic log files for investigation</p>
+                        <h1 class="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-2">Upload Logs</h1>
+                        <p class="text-xs sm:text-sm md:text-base text-gray-600 dark:text-gray-400">Secure ingestion of forensic log files for investigation</p>
                     </div>
                     <div class="self-start md:self-auto flex items-center gap-2 text-xs md:text-sm text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-800/50 px-3 py-1.5 rounded-lg border border-gray-100 dark:border-gray-700">
                         <span class="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-green-500 animate-pulse"></span>
@@ -32,18 +32,18 @@ const UploadPage = {
                         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700/50 overflow-hidden">
                             <div class="p-4 md:p-8">
                                 <!-- Drag & Drop Zone -->
-                                <div id="uploadArea" class="relative group cursor-pointer border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl p-6 md:p-12 text-center hover:border-blue-500 dark:hover:border-blue-400 transition-all duration-300 bg-gray-50/50 dark:bg-gray-800/50 hover:bg-blue-50/50 dark:hover:bg-blue-900/10">
+                                <div id="uploadArea" class="relative group cursor-pointer border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl p-4 sm:p-6 md:p-12 text-center hover:border-blue-500 dark:hover:border-blue-400 transition-all duration-300 bg-gray-50/50 dark:bg-gray-800/50 hover:bg-blue-50/50 dark:hover:bg-blue-900/10">
                                     <input type="file" id="fileInput" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" accept=".log,.txt,.csv,.json" multiple>
                                     
                                     <div class="relative z-0 pointer-events-none transition-transform duration-300 group-hover:scale-105">
-                                        <div class="w-12 h-12 md:w-16 md:h-16 mx-auto bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-full flex items-center justify-center mb-4 text-2xl md:text-3xl shadow-sm">
+                                        <div class="w-10 h-10 sm:w-12 sm:h-12 md:w-16 md:h-16 mx-auto bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-full flex items-center justify-center mb-4 text-2xl md:text-3xl shadow-sm">
                                             📤
                                         </div>
-                                        <h3 class="text-lg md:text-xl font-bold text-gray-900 dark:text-white mb-2">Drag & drop log files</h3>
-                                        <p class="text-sm text-gray-500 dark:text-gray-400 mb-6">or click to browse</p>
+                                        <h3 class="text-base sm:text-lg md:text-xl font-bold text-gray-900 dark:text-white mb-2">Drag & drop log files</h3>
+                                        <p class="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mb-6">or click to browse</p>
                                         
                                         <!-- Fallback Action -->
-                                        <span class="inline-flex items-center px-4 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-200 shadow-sm group-hover:border-blue-500 dark:group-hover:border-blue-400 transition-colors">
+                                        <span class="inline-flex items-center px-4 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-200 shadow-sm group-hover:border-blue-500 dark:group-hover:border-blue-400 transition-colors">
                                             Select Files
                                         </span>
                                     </div>
@@ -70,9 +70,9 @@ const UploadPage = {
 
                         <!-- 4. Uploaded Files List (Read-Only) -->
                         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700/50 overflow-hidden">
-                            <div class="px-4 md:px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
-                                <h3 class="text-lg font-bold text-gray-900 dark:text-white">Evidence Locker</h3>
-                                <span class="text-xs font-medium text-gray-500 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">Read-Only</span>
+                            <div class="px-4 md:px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex flex-wrap gap-2 justify-between items-center">
+                                <h3 class="text-base sm:text-lg font-bold text-gray-900 dark:text-white">Evidence Locker</h3>
+                                <span class="text-[10px] sm:text-xs font-medium text-gray-500 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">Read-Only</span>
                             </div>
                             <div class="w-full overflow-x-auto [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-transparent hover:[&::-webkit-scrollbar-thumb]:bg-gray-300 dark:hover:[&::-webkit-scrollbar-thumb]:bg-gray-600">
                                 <table class="w-full divide-y divide-gray-200 dark:divide-gray-700">

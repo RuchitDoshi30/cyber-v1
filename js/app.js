@@ -15,7 +15,12 @@ const App = {
 
     init() {
         this.setupNavigation();
-        this.loadPage('dashboard');
+
+        // Restore previous session state or default to dashboard
+        const savedPage = localStorage.getItem('cyber_active_page');
+        const startPage = this.pages[savedPage] ? savedPage : 'dashboard';
+
+        this.loadPage(startPage);
     },
 
     setupNavigation() {
@@ -37,6 +42,9 @@ const App = {
 
         // Update current page
         this.currentPage = pageName;
+
+        // Persist navigation state (State Persistence Feature)
+        localStorage.setItem('cyber_active_page', pageName);
 
         // Update active navigation
         document.querySelectorAll('.nav-link').forEach(link => {

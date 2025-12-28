@@ -24,10 +24,10 @@ const Components = {
     // Chart Container
     createChartContainer(id, title, subtitle, height = '300px', cols = 'col-span-1') {
         return `
-            <div class="bg-white dark:bg-gray-800 rounded-lg p-6 border border-gray-200 dark:border-gray-700/50 shadow-lg ${cols}">
+            <div class="bg-white dark:bg-gray-800 rounded-lg p-4 sm:p-6 border border-gray-200 dark:border-gray-700/50 shadow-lg ${cols}">
                 <div class="mb-4">
                     <h3 class="text-lg font-bold text-gray-900 dark:text-white">${title}</h3>
-                    ${subtitle ? `<p class="text-sm text-gray-500 dark:text-gray-400">${subtitle}</p>` : ''}
+                    ${subtitle ? `<p class="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1">${subtitle}</p>` : ''}
                 </div>
                 <div class="relative w-full" style="height: ${height}">
                     <canvas id="${id}"></canvas>
@@ -446,14 +446,14 @@ const Components = {
                 'Process signature deviates from known-good allowlist for this host type.';
 
         return `
-            <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700/50 p-6 shadow-lg mb-6 last:mb-0">
+            <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700/50 p-4 sm:p-6 shadow-lg mb-6 last:mb-0">
                 <!-- Header -->
-                <div class="flex justify-between items-start mb-4">
+                <div class="flex flex-col sm:flex-row justify-between items-start mb-4 gap-2">
                     <div>
-                        <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-1">${anomaly.title || anomaly.description}</h3>
-                        <p class="text-sm text-gray-600 dark:text-gray-400">${anomaly.description}</p>
+                        <h3 class="text-base sm:text-lg font-bold text-gray-900 dark:text-white mb-1">${anomaly.title || anomaly.description}</h3>
+                        <p class="text-xs sm:text-sm text-gray-600 dark:text-gray-400">${anomaly.description}</p>
                     </div>
-                    <span class="px-3 py-1 rounded text-xs font-bold uppercase tracking-wide border ${severityClass}">
+                    <span class="self-start px-2 py-1 rounded text-[10px] sm:text-xs font-bold uppercase tracking-wide border ${severityClass}">
                         ${severityLabel.toUpperCase()}
                     </span>
                 </div>
@@ -473,6 +473,17 @@ const Components = {
                 <div class="mb-6 bg-yellow-50 dark:bg-yellow-900/10 p-3 rounded border border-yellow-100 dark:border-yellow-900/30">
                     <p class="text-xs font-bold text-yellow-700 dark:text-yellow-500 uppercase mb-1">🔍 Why was this flagged?</p>
                     <p class="text-sm text-gray-700 dark:text-gray-300 italic">"${xaiExplanation}"</p>
+                </div>
+
+                <!-- Attack Correlation Graph (Expandable) -->
+                <div class="mb-6 border-t border-gray-100 dark:border-gray-700 pt-4">
+                    <button onclick="InsightsPage.toggleGraph('${anomaly.id}')" class="flex items-center gap-2 text-sm font-bold text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors w-full text-left group">
+                        <svg id="arrow-${anomaly.id}" class="w-4 h-4 transform transition-transform text-gray-400 group-hover:text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        View Attack Correlation Graph
+                    </button>
+                    <div id="graph-container-${anomaly.id}" class="hidden mt-4 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 p-4 h-64 md:h-80 relative overflow-hidden flex items-center justify-center">
+                        <span class="text-xs text-gray-400 animate-pulse">Initializing visualization...</span>
+                    </div>
                 </div>
 
                 <!-- Affected Systems -->
@@ -604,13 +615,13 @@ const Components = {
     // Report Configuration Selection Card
     createSelectionCard(id, title, subtitle, checked) {
         return `
-            <label class="relative flex items-start gap-4 p-5 rounded-lg border border-gray-200 dark:border-gray-700/50 bg-white dark:bg-gray-800/40 hover:bg-gray-50 dark:hover:bg-gray-800/60 cursor-pointer transition-all duration-200 group shadow-sm">
+            <label class="relative flex items-start gap-3 sm:gap-4 p-3 sm:p-5 rounded-lg border border-gray-200 dark:border-gray-700/50 bg-white dark:bg-gray-800/40 hover:bg-gray-50 dark:hover:bg-gray-800/60 cursor-pointer transition-all duration-200 group shadow-sm">
                 <input type="checkbox" id="${id}" ${checked ? 'checked' : ''} class="peer sr-only">
-                <div class="w-5 h-5 mt-1 rounded border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-900 flex items-center justify-center peer-checked:bg-blue-600 peer-checked:border-blue-600 transition-colors">
+                <div class="w-5 h-5 mt-1 rounded border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-900 flex items-center justify-center peer-checked:bg-blue-600 peer-checked:border-blue-600 transition-colors shrink-0">
                     <svg class="w-3.5 h-3.5 text-white opacity-0 peer-checked:opacity-100" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
                 </div>
                 <div>
-                    <span class="block text-base font-bold text-gray-900 dark:text-gray-200 mb-1 group-hover:text-blue-600 dark:group-hover:text-white transition-colors">${title}</span>
+                    <span class="block text-sm sm:text-base font-bold text-gray-900 dark:text-gray-200 mb-1 group-hover:text-blue-600 dark:group-hover:text-white transition-colors">${title}</span>
                     <span class="block text-xs text-gray-500 dark:text-gray-400 leading-relaxed">${subtitle}</span>
                 </div>
                 <div class="absolute inset-0 rounded-lg border-2 border-transparent peer-checked:border-blue-500/50 pointer-events-none"></div>
@@ -621,7 +632,7 @@ const Components = {
     // Export Format Option Card
     createExportCard(format, icon, description, onClick) {
         return `
-            <button onclick="${onClick}" class="flex flex-col items-center justify-center p-6 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700/50 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-blue-400 dark:hover:border-gray-600 transition-all duration-200 group w-full text-center shadow-sm hover:shadow-md">
+            <button onclick="${onClick}" class="flex flex-col items-center justify-center p-4 sm:p-6 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700/50 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-blue-400 dark:hover:border-gray-600 transition-all duration-200 group w-full text-center shadow-sm hover:shadow-md">
                 <div class="text-3xl mb-4 text-gray-400 group-hover:text-blue-600 dark:group-hover:text-white transition-colors transform group-hover:scale-110 duration-200">${icon}</div>
                 <span class="block text-sm font-bold text-gray-900 dark:text-gray-200 mb-1">${format}</span>
                 <span class="block text-xs text-gray-500 dark:text-gray-400">${description}</span>
@@ -670,5 +681,627 @@ const Components = {
                 </div>
             </div>
         `;
+    },
+
+    // Attack Correlation Node Graph (New Function)
+    renderAttackGraph(containerId, anomalyId) {
+        const container = document.getElementById(containerId);
+        // Prevent re-rendering if SVG exists, but allow overwriting "Initializing..." placeholder
+        if (!container || container.querySelector('svg')) return;
+
+        // Dummy Data Generation (Visual Only)
+        // In a real app, this would come from the anomaly object
+        const nodes = [
+            { x: 300, y: 60, label: 'Ext IP', sub: '198.51.100.24', type: 'ip' },
+            { x: 500, y: 160, label: 'Server', sub: 'DB-Prod-01', type: 'server' },
+            { x: 300, y: 260, label: 'Admin', sub: 'sys_admin', type: 'user' },
+            { x: 100, y: 160, label: 'Firewall', sub: 'Port 443', type: 'log' }
+        ];
+
+        // Center Node
+        const center = { x: 300, y: 160, label: 'Anomaly', type: 'center' };
+
+        const createNode = (n) => {
+            const isCenter = n.type === 'center';
+            const r = isCenter ? 25 : 18;
+            const bgClass = isCenter ? 'fill-red-100 dark:fill-red-900/40' : 'fill-white dark:fill-gray-800';
+            const strokeClass = isCenter ? 'stroke-red-500' : 'stroke-blue-500 dark:stroke-blue-400';
+            const textClass = isCenter ? 'fill-red-600 dark:fill-red-400 font-bold' : 'fill-gray-600 dark:fill-gray-300';
+
+            let icon = '⚠️';
+            if (n.type === 'ip') icon = '🌐';
+            if (n.type === 'server') icon = '🖥️';
+            if (n.type === 'user') icon = '👤';
+            if (n.type === 'log') icon = '📝';
+
+            return `
+                <g class="node transition-all duration-300 hover:opacity-80 cursor-pointer" onclick="event.stopPropagation()">
+                    <circle cx="${n.x}" cy="${n.y}" r="${r}" class="${bgClass} ${strokeClass}" stroke-width="2"></circle>
+                    <text x="${n.x}" y="${n.y}" dy="5" text-anchor="middle" class="text-xs pointer-events-none ${textClass}" style="font-size: ${isCenter ? '14px' : '10px'}">${icon}</text>
+                    <text x="${n.x}" y="${n.y + r + 14}" text-anchor="middle" class="text-[10px] uppercase font-bold fill-gray-800 dark:fill-gray-200 tracking-wider">${n.label}</text>
+                    <text x="${n.x}" y="${n.y + r + 24}" text-anchor="middle" class="text-[9px] fill-gray-500 dark:fill-gray-400 font-mono">${n.sub || ''}</text>
+                </g>
+             `;
+        };
+
+        const edges = nodes.map(n => `
+            <line x1="${center.x}" y1="${center.y}" x2="${n.x}" y2="${n.y}" class="stroke-gray-300 dark:stroke-gray-600" stroke-width="1" stroke-dasharray="4 4">
+                <animate attributeName="stroke-dashoffset" from="8" to="0" dur="1.5s" repeatCount="indefinite" />
+            </line>
+        `).join('');
+
+        const svg = `
+            <svg viewBox="0 0 600 320" class="w-full h-full select-none" preserveAspectRatio="xMidYMid meet">
+                <defs>
+                    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+                        <feGaussianBlur stdDeviation="2" result="blur" />
+                        <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                    </filter>
+                </defs>
+                ${edges}
+                ${createNode(center)}
+                ${nodes.map(n => createNode(n)).join('')}
+            </svg>
+        `;
+
+        container.innerHTML = svg;
+    },
+
+    renderForceGraph(containerId, anomalyId) {
+        const container = document.getElementById(containerId);
+        if (!container || container.querySelector('svg')) return;
+
+        container.innerHTML = '';
+
+        const width = container.clientWidth || 600;
+        const height = container.clientHeight || 320;
+        const centerNode = { id: 'center', x: width / 2, y: height / 2, label: 'Anomaly', type: 'center', fixed: true };
+
+        const nodes = [centerNode];
+        // Dynamic Spoke Generation
+        const spokeTypes = [
+            { label: 'Attacker IP', sub: '198.51.100.24', type: 'ip' },
+            { label: 'DB-Prod-01', sub: 'Target Server', type: 'server' },
+            { label: 'admin_sys', sub: 'Compromised User', type: 'user' },
+            { label: 'Firewall', sub: 'Log Source', type: 'log' },
+            { label: 'Port 443', sub: 'Vector', type: 'log' }
+        ];
+
+        const links = [];
+        spokeTypes.forEach((nt, i) => {
+            const angle = (i / spokeTypes.length) * 2 * Math.PI;
+            const dist = 100;
+            nodes.push({
+                id: `n${i}`,
+                x: width / 2 + Math.cos(angle) * dist,
+                y: height / 2 + Math.sin(angle) * dist,
+                vx: 0, vy: 0,
+                ...nt
+            });
+            links.push({ source: centerNode, target: nodes[nodes.length - 1] });
+        });
+
+        const svgNS = "http://www.w3.org/2000/svg";
+        const svg = document.createElementNS(svgNS, "svg");
+        svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
+        svg.classList.add("w-full", "h-full", "select-none", "cursor-move");
+        container.appendChild(svg);
+
+        const defs = document.createElementNS(svgNS, "defs");
+        defs.innerHTML = `
+            <filter id="glow-force" x="-20%" y="-20%" width="140%" height="140%">
+                <feGaussianBlur stdDeviation="3" result="blur" />
+                <feComposite in="SourceGraphic" in2="blur" operator="over" />
+            </filter>
+        `;
+        svg.appendChild(defs);
+
+        const linkElements = links.map(l => {
+            const line = document.createElementNS(svgNS, "line");
+            line.classList.add("stroke-gray-300", "dark:stroke-gray-600");
+            line.setAttribute("stroke-width", "1.5");
+            line.setAttribute("stroke-dasharray", "4 4");
+            svg.appendChild(line);
+            return { el: line, link: l };
+        });
+
+        const nodeElements = nodes.map(n => {
+            const g = document.createElementNS(svgNS, "g");
+            g.classList.add("cursor-grab", "transition-opacity", "duration-300", "hover:opacity-80");
+
+            const isCenter = n.type === 'center';
+            const r = isCenter ? 28 : 20;
+
+            const circle = document.createElementNS(svgNS, "circle");
+            circle.setAttribute("r", r);
+            if (isCenter) {
+                circle.setAttribute("class", "fill-red-100 dark:fill-red-900/40 stroke-red-500 stroke-2");
+                circle.setAttribute("filter", "url(#glow-force)");
+            } else {
+                circle.setAttribute("class", "fill-white dark:fill-gray-800 stroke-blue-500 dark:stroke-blue-400 stroke-2");
+            }
+
+            const fs = isCenter ? 14 : 10;
+            const textIcon = document.createElementNS(svgNS, "text");
+            textIcon.setAttribute("dy", "5");
+            textIcon.setAttribute("text-anchor", "middle");
+            textIcon.setAttribute("style", `font-size: ${fs}px`);
+            textIcon.setAttribute("class", "pointer-events-none fill-gray-900 dark:fill-white");
+            textIcon.textContent = isCenter ? '⚠️' : n.type === 'ip' ? '🌐' : n.type === 'server' ? '🖥️' : n.type === 'user' ? '👤' : '📄';
+
+            const textLabel = document.createElementNS(svgNS, "text");
+            textLabel.setAttribute("dy", r + 15);
+            textLabel.setAttribute("text-anchor", "middle");
+            textLabel.setAttribute("class", "text-[10px] font-bold fill-gray-800 dark:fill-gray-200 uppercase tracking-wider pointer-events-none");
+            textLabel.textContent = n.label;
+
+            g.appendChild(circle);
+            g.appendChild(textIcon);
+            g.appendChild(textLabel);
+            svg.appendChild(g);
+
+            const startDrag = (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                let draggedNode = n;
+
+                const moveHandler = (ev) => {
+                    const pt = svg.createSVGPoint();
+                    pt.x = ev.clientX || ev.touches?.[0].clientX;
+                    pt.y = ev.clientY || ev.touches?.[0].clientY;
+                    const loc = pt.matrixTransform(svg.getScreenCTM().inverse());
+                    draggedNode.x = loc.x;
+                    draggedNode.y = loc.y;
+                    draggedNode.vx = 0; draggedNode.vy = 0;
+                };
+
+                const endHandler = () => {
+                    window.removeEventListener('mousemove', moveHandler);
+                    window.removeEventListener('mouseup', endHandler);
+                    window.removeEventListener('touchmove', moveHandler);
+                    window.removeEventListener('touchend', endHandler);
+                    draggedNode = null;
+                };
+
+                window.addEventListener('mousemove', moveHandler);
+                window.addEventListener('mouseup', endHandler);
+                window.addEventListener('touchmove', moveHandler, { passive: false });
+                window.addEventListener('touchend', endHandler);
+            };
+
+            g.addEventListener('mousedown', startDrag);
+            g.addEventListener('touchstart', startDrag, { passive: false });
+
+            return { el: g, node: n };
+        });
+
+        // Verlet Integration Loop
+        const animate = () => {
+            for (let i = 0; i < nodes.length; i++) {
+                const a = nodes[i];
+                if (a.fixed) continue;
+
+                let fx = 0, fy = 0;
+
+                // Repulsion
+                for (let j = 0; j < nodes.length; j++) {
+                    if (i === j) continue;
+                    const b = nodes[j];
+                    const dx = a.x - b.x;
+                    const dy = a.y - b.y;
+                    const d2 = dx * dx + dy * dy;
+                    if (d2 > 0) {
+                        const force = 3000 / (d2 + 100);
+                        const dist = Math.sqrt(d2);
+                        fx += (dx / dist) * force;
+                        fy += (dy / dist) * force;
+                    }
+                }
+
+                // Spring
+                links.forEach(l => {
+                    const other = l.source === a ? l.target : l.target === a ? l.source : null;
+                    if (other) {
+                        const dx = a.x - other.x;
+                        const dy = a.y - other.y;
+                        const dist = Math.sqrt(dx * dx + dy * dy);
+                        const targetDist = 140;
+                        const force = (dist - targetDist) * 0.02;
+                        fx -= (dx / dist) * force;
+                        fy -= (dy / dist) * force;
+                    }
+                });
+
+                // Center Gravity
+                const dxC = a.x - width / 2;
+                const dyC = a.y - height / 2;
+                fx -= dxC * 0.002;
+                fy -= dyC * 0.002;
+
+                a.vx = (a.vx + fx) * 0.92;
+                a.vy = (a.vy + fy) * 0.92;
+                a.x += a.vx;
+                a.y += a.vy;
+
+                a.x = Math.max(30, Math.min(width - 30, a.x));
+                a.y = Math.max(30, Math.min(height - 30, a.y));
+            }
+
+            nodeElements.forEach(item => {
+                item.el.setAttribute("transform", `translate(${item.node.x}, ${item.node.y})`);
+            });
+            linkElements.forEach(item => {
+                item.el.setAttribute("x1", item.link.source.x);
+                item.el.setAttribute("y1", item.link.source.y);
+                item.el.setAttribute("x2", item.link.target.x);
+                item.el.setAttribute("y2", item.link.target.y);
+            });
+
+            requestAnimationFrame(animate);
+        };
+
+        animate();
+    },
+
+    renderEnhancedForceGraph(containerId, anomalyId) {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+        if (container.querySelector('svg')) return;
+
+        container.innerHTML = '';
+
+        const width = container.clientWidth || 600;
+        const height = container.clientHeight || 320;
+
+        // Data Setup
+        const centerNode = { id: 'center', x: width / 2, y: height / 2, label: 'ANOMALY', type: 'center', fx: width / 2, fy: height / 2 };
+
+        const nodes = [centerNode];
+        const spokeTypes = [
+            { label: 'Attacker IP', sub: '198.51.100.24', type: 'ip' },
+            { label: 'DB-Prod-01', sub: 'Target Server', type: 'server' },
+            { label: 'admin_sys', sub: 'Compromised User', type: 'user' },
+            { label: 'Firewall', sub: 'Log Source', type: 'log' },
+            { label: 'Port 443', sub: 'Vector', type: 'log' },
+            { label: 'Auth Service', sub: 'Affected App', type: 'app' }
+        ];
+
+        const links = [];
+        spokeTypes.forEach((nt, i) => {
+            const angle = (i / spokeTypes.length) * 2 * Math.PI;
+            const dist = Math.min(width, height) * 0.35; // Dynamic placement
+            nodes.push({
+                id: `n${i}`,
+                x: width / 2 + Math.cos(angle) * dist,
+                y: height / 2 + Math.sin(angle) * dist,
+                vx: 0, vy: 0,
+                ...nt
+            });
+            links.push({ source: centerNode, target: nodes[nodes.length - 1] });
+        });
+
+        // SVG Setup
+        const svgNS = "http://www.w3.org/2000/svg";
+        const svg = document.createElementNS(svgNS, "svg");
+        svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
+        svg.classList.add("w-full", "h-full", "select-none", "cursor-grab", "active:cursor-grabbing");
+        container.appendChild(svg);
+
+        // Definitions
+        const defs = document.createElementNS(svgNS, "defs");
+        defs.innerHTML = `
+            <filter id="glow-strong" x="-50%" y="-50%" width="200%" height="200%">
+                <feGaussianBlur stdDeviation="3" result="blur" />
+                <feComposite in="SourceGraphic" in2="blur" operator="over" />
+            </filter>
+        `;
+        svg.appendChild(defs);
+
+        // Render Groups
+        const linkGroup = document.createElementNS(svgNS, "g");
+        const nodeGroup = document.createElementNS(svgNS, "g");
+        const particleGroup = document.createElementNS(svgNS, "g");
+        svg.appendChild(linkGroup);
+        svg.appendChild(particleGroup);
+        svg.appendChild(nodeGroup);
+
+        // Link Elements
+        const linkElements = links.map(l => {
+            const line = document.createElementNS(svgNS, "line");
+            line.classList.add("stroke-blue-300", "dark:stroke-blue-800", "opacity-40");
+            line.setAttribute("stroke-width", "1");
+            linkGroup.appendChild(line);
+            return { el: line, link: l };
+        });
+
+        // Particles
+        const particles = [];
+        links.forEach((l, idx) => {
+            for (let i = 0; i < 2; i++) {
+                const p = document.createElementNS(svgNS, "circle");
+                p.setAttribute("r", "2");
+                p.classList.add("fill-blue-400", "dark:fill-cyan-300");
+                p.setAttribute("filter", "url(#glow-strong)");
+                particleGroup.appendChild(p);
+                particles.push({
+                    el: p,
+                    link: l,
+                    t: i * 0.5,
+                    speed: 0.003 + Math.random() * 0.002
+                });
+            }
+        });
+
+        // Node Elements
+        const nodeElements = nodes.map(n => {
+            const g = document.createElementNS(svgNS, "g");
+            g.classList.add("transition-opacity", "duration-200");
+
+            const isCenter = n.type === 'center';
+
+            // HUD Ring for Center
+            if (isCenter) {
+                const ring = document.createElementNS(svgNS, "circle");
+                ring.setAttribute("r", "40");
+                ring.setAttribute("fill", "none");
+                ring.setAttribute("stroke", "currentColor");
+                ring.setAttribute("stroke-width", "1");
+                ring.setAttribute("stroke-dasharray", "20 10");
+                ring.classList.add("text-red-500", "opacity-30", "dark:text-red-400");
+
+                const anim = document.createElementNS(svgNS, "animateTransform");
+                anim.setAttribute("attributeName", "transform");
+                anim.setAttribute("type", "rotate");
+                anim.setAttribute("from", "0 0 0");
+                anim.setAttribute("to", "360 0 0");
+                anim.setAttribute("dur", "20s");
+                anim.setAttribute("repeatCount", "indefinite");
+                ring.appendChild(anim);
+                g.appendChild(ring);
+            }
+
+            // Shape
+            const r = isCenter ? 24 : 16;
+            let shape;
+            if (n.type === 'server') {
+                shape = document.createElementNS(svgNS, "polygon");
+                const hexPoints = [];
+                for (let k = 0; k < 6; k++) {
+                    const ang = k * Math.PI / 3;
+                    hexPoints.push(`${Math.cos(ang) * r},${Math.sin(ang) * r}`);
+                }
+                shape.setAttribute("points", hexPoints.join(' '));
+            } else if (n.type === 'app') {
+                shape = document.createElementNS(svgNS, "rect");
+                shape.setAttribute("x", -r);
+                shape.setAttribute("y", -r);
+                shape.setAttribute("width", r * 2);
+                shape.setAttribute("height", r * 2);
+                shape.setAttribute("rx", 3);
+            } else {
+                shape = document.createElementNS(svgNS, "circle");
+                shape.setAttribute("r", r);
+            }
+
+            if (isCenter) {
+                shape.setAttribute("class", "fill-red-600 dark:fill-red-900 stroke-red-400 stroke-2");
+                shape.setAttribute("filter", "url(#glow-strong)");
+            } else if (n.type === 'server') {
+                shape.setAttribute("class", "fill-gray-100 dark:fill-gray-800 stroke-purple-500 stroke-2");
+            } else if (n.type === 'ip') {
+                shape.setAttribute("class", "fill-gray-100 dark:fill-gray-800 stroke-cyan-500 stroke-2");
+            } else if (n.type === 'app') {
+                shape.setAttribute("class", "fill-gray-100 dark:fill-gray-800 stroke-green-500 stroke-2");
+            } else {
+                shape.setAttribute("class", "fill-gray-100 dark:fill-gray-800 stroke-blue-500 stroke-2");
+            }
+            g.appendChild(shape);
+
+            // Icon & Label
+            const fs = isCenter ? 14 : 10;
+            const textIcon = document.createElementNS(svgNS, "text");
+            textIcon.setAttribute("dy", "4");
+            textIcon.setAttribute("text-anchor", "middle");
+            textIcon.setAttribute("style", `font-size: ${fs}px`);
+            textIcon.classList.add("pointer-events-none", isCenter ? "fill-white" : "fill-gray-800", "dark:fill-gray-200");
+            textIcon.textContent = isCenter ? '⚠️' : n.type === 'ip' ? '🌐' : n.type === 'server' ? '💾' : n.type === 'user' ? '👤' : n.type === 'app' ? '📱' : '📄';
+            g.appendChild(textIcon);
+
+            if (!isCenter) {
+                const textLabel = document.createElementNS(svgNS, "text");
+                textLabel.setAttribute("dy", r + 14);
+                textLabel.setAttribute("text-anchor", "middle");
+                textLabel.classList.add("text-[9px]", "font-bold", "fill-gray-600", "dark:fill-gray-400", "uppercase", "tracking-wider", "pointer-events-none");
+                textLabel.textContent = n.label;
+                g.appendChild(textLabel);
+            }
+
+            nodeGroup.appendChild(g);
+
+            // Mouse Events
+            g.addEventListener('mouseenter', () => {
+                nodeElements.forEach(other => {
+                    const isConnected = links.some(l => (l.source === n && l.target === other.node) || (l.target === n && l.source === other.node)) || other.node === n;
+                    other.el.style.opacity = isConnected ? '1' : '0.1';
+                });
+                linkElements.forEach(line => {
+                    const isConnected = line.link.source === n || line.link.target === n;
+                    line.el.style.opacity = isConnected ? '0.8' : '0.05';
+                    line.el.setAttribute("stroke-width", isConnected ? "2" : "1");
+                });
+                particles.forEach(p => {
+                    const isConnected = p.link.source === n || p.link.target === n;
+                    p.el.style.opacity = isConnected ? '1' : '0';
+                });
+            });
+
+            g.addEventListener('mouseleave', () => {
+                nodeElements.forEach(other => other.el.style.opacity = '1');
+                linkElements.forEach(line => {
+                    line.el.style.opacity = '0.4';
+                    line.el.setAttribute("stroke-width", "1");
+                });
+                particles.forEach(p => p.el.style.opacity = '1');
+            });
+
+            // Drag Implementation
+            const startDrag = (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                let draggedNode = n;
+                alphaTarget = 0.3; // Re-heat simulation
+                restart(); // Wake up loop if stopped
+
+                const moveHandler = (ev) => {
+                    const pt = svg.createSVGPoint();
+                    pt.x = ev.clientX || ev.touches?.[0].clientX;
+                    pt.y = ev.clientY || ev.touches?.[0].clientY;
+                    const loc = pt.matrixTransform(svg.getScreenCTM().inverse());
+                    draggedNode.fx = loc.x;
+                    draggedNode.fy = loc.y;
+                };
+
+                const endHandler = () => {
+                    window.removeEventListener('mousemove', moveHandler);
+                    window.removeEventListener('mouseup', endHandler);
+                    window.removeEventListener('touchmove', moveHandler);
+                    window.removeEventListener('touchend', endHandler);
+                    alphaTarget = 0; // Cool down
+                    // Node remains pinned at fx, fy
+                    draggedNode = null;
+                };
+
+                window.addEventListener('mousemove', moveHandler);
+                window.addEventListener('mouseup', endHandler);
+                window.addEventListener('touchmove', moveHandler, { passive: false });
+                window.addEventListener('touchend', endHandler);
+            };
+
+            g.addEventListener('mousedown', startDrag);
+            g.addEventListener('touchstart', startDrag, { passive: false });
+
+            return { el: g, node: n };
+        });
+
+        // Simulation State
+        let alpha = 1;
+        let alphaTarget = 0;
+        let alphaDecay = 0.02; // Fast settling
+        const velocityDecay = 0.6; // High friction for stability
+
+        const tick = () => {
+            alpha += (alphaTarget - alpha) * alphaDecay;
+
+            if (alpha < 0.005) return false; // Stop if cooled down
+
+            // Forces
+            for (let i = 0; i < nodes.length; i++) {
+                const a = nodes[i];
+                if (a.fx != null) {
+                    a.x = a.fx;
+                    a.y = a.fy;
+                    a.vx = 0;
+                    a.vy = 0;
+                    continue;
+                }
+
+                let fx = 0, fy = 0;
+
+                // 1. Center Gravity (Gentle)
+                const dxC = a.x - width / 2;
+                const dyC = a.y - height / 2;
+                fx -= dxC * 0.01 * alpha;
+                fy -= dyC * 0.01 * alpha;
+
+                // 2. Repulsion (Stronger)
+                for (let j = 0; j < nodes.length; j++) {
+                    if (i === j) continue;
+                    const b = nodes[j];
+                    const dx = a.x - b.x;
+                    const dy = a.y - b.y;
+                    let distSq = dx * dx + dy * dy;
+                    if (distSq === 0) { distSq = 1; fx += Math.random(); fy += Math.random(); }
+                    const dist = Math.sqrt(distSq);
+                    const force = (2000 / distSq) * alpha; // Repulsion Strength
+                    fx += (dx / dist) * force;
+                    fy += (dy / dist) * force;
+                }
+
+                // 3. Links (Spring)
+                links.forEach(l => {
+                    const target = l.source === a ? l.target : l.target === a ? l.source : null;
+                    if (target) {
+                        const dx = a.x - target.x;
+                        const dy = a.y - target.y;
+                        const dist = Math.sqrt(dx * dx + dy * dy);
+                        const desired = Math.min(width, height) * 0.4; // Dynamic spring length
+                        const strain = (dist - desired) * 0.05 * alpha;
+                        fx -= (dx / dist) * strain;
+                        fy -= (dy / dist) * strain;
+                    }
+                });
+
+                // Apply Velocity
+                a.vx = (a.vx + fx) * velocityDecay;
+                a.vy = (a.vy + fy) * velocityDecay;
+                a.x += a.vx;
+                a.y += a.vy;
+
+                // Bounds
+                a.x = Math.max(20, Math.min(width - 20, a.x));
+                a.y = Math.max(20, Math.min(height - 20, a.y));
+            }
+            return true;
+        };
+
+        const render = () => {
+            nodeElements.forEach(item => {
+                item.el.setAttribute("transform", `translate(${item.node.x}, ${item.node.y})`);
+            });
+            linkElements.forEach(item => {
+                item.el.setAttribute("x1", item.link.source.x);
+                item.el.setAttribute("y1", item.link.source.y);
+                item.el.setAttribute("x2", item.link.target.x);
+                item.el.setAttribute("y2", item.link.target.y);
+            });
+            // Particles
+            particles.forEach(p => {
+                p.t += p.speed;
+                if (p.t > 1) p.t = 0;
+                const sx = p.link.source.x, sy = p.link.source.y;
+                const tx = p.link.target.x, ty = p.link.target.y;
+                p.el.setAttribute("cx", sx + (tx - sx) * p.t);
+                p.el.setAttribute("cy", sy + (ty - sy) * p.t);
+            });
+        };
+
+        // PRE-WARM Simulation (100 ticks)
+        for (let k = 0; k < 120; k++) {
+            tick();
+        }
+        render(); // Initial static render
+
+        // Animation Loop
+        let running = false;
+        const restart = () => {
+            if (!running) {
+                running = true;
+                requestAnimationFrame(loop);
+            }
+        };
+
+        const loop = () => {
+            const active = tick();
+            render();
+            if (active || alphaTarget > 0) {
+                requestAnimationFrame(loop);
+            } else {
+                requestAnimationFrame(loop);
+            }
+        };
+        restart();
     }
 };
+
+
+
